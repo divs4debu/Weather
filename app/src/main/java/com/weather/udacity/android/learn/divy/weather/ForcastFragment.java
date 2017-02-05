@@ -14,6 +14,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import org.json.JSONException;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -76,7 +78,7 @@ public  class ForcastFragment extends Fragment {
         @Override
         protected Void doInBackground(String... params) {
             HttpURLConnection httpURLConnection = null;
-            String json;
+            String json = "";
 
 
             try {
@@ -101,13 +103,19 @@ public  class ForcastFragment extends Fragment {
                 httpURLConnection.connect();
 
                 Scanner sc = new Scanner(httpURLConnection.getInputStream());
-                json = sc.next();
+                while(sc.hasNext()) {
+                    json += sc.next();
+                }
                 sc.close();
                 Log.i(LOG_TAG, json);
+                WeatherForcastParser parser = new WeatherForcastParser(json);
+                parser.parse();
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
                 e.printStackTrace();
             } finally {
                 if (httpURLConnection != null)
